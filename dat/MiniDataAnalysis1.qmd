@@ -1,7 +1,7 @@
 ---
 title: "Mini Data-Analysis: Deliverable 1"
 format: gfm
-author: "Your name here"
+author: "ELizabeth Patterson"
 ---
 
 Total points available: 74
@@ -74,9 +74,9 @@ Out of the 5 data sets listed above, choose **2** that appeal to you based on th
 <!-------------------------- Start your work below ---------------------------->
 
 1: Write 1st choice here
-
+boulder-2020-residential_sales
 2: Write 2nd choice here
-
+RollingStone500.csv
 
 <!----------------------------------------------------------------------------->
 
@@ -89,25 +89,59 @@ One way to narrowing down your selection is to *explore* the data sets. Use your
 
 #### Data Set 1
 ```{r}
+boulder <- read_csv("boulder-2020-residential_sales.csv")
 ### Explore 3 variables of data set 1 ###
+glimpse(boulder)
 
+boulder |>
+  select(ACCOUNT_TYPE, BLDG1_YEAR_BUILT, SALE_DATE) |>
+  filter(ACCOUNT_TYPE == "RESIDENTIAL") |>
+  arrange(desc(BLDG1_YEAR_BUILT))
+
+boulder |>
+  filter(BLDG1_DESIGN == "1 Story - Ranch") |>
+  mutate(sale_price_num = as.integer(parse_number(SALE_PRICE))) |>
+  summarise(mean_sale_price = mean(sale_price_num, na.rm=TRUE)) 
+
+boulder |>
+  filter(BLDG1_DESIGN == "2-3 Story") |>
+  summarise(mean_bedrooms = mean(BEDROOMS, na.rm=TRUE))
 ```
 
 
 Write your findings here.
-
-
+1) The most recent residential building that was built from our data was built in 2020 and sold 2/14/2020 and the oldest was built 1998 and sold 3/30/2020.
+2)The average sale price for Ranch style 1 story houses is $629,652.6
+3)The average amount of bedrooms for houses that are 2-3 stories is about 3.9 (3-4 bedrooms).
 
 
 #### Data Set 2
 ```{r}
+music <- read_csv("RollingStone500.csv")
 ### Explore 3 variables of data set 2 ###
+glimpse(music)
 
+music |>
+  filter(`Album Genre` == "Country/Folk/Country Rock/Folk Rock") |>
+  mutate(`Spotify Popularity` = as.numeric(`Spotify Popularity`)) |>
+           summarise(mean_country_pop = mean(`Spotify Popularity`, na.rm=TRUE))
+
+music |>
+  group_by(`Album`) |>
+  filter(`2020 Rank` != "NA") |>
+  arrange((`2020 Rank`))
+
+music |>
+  filter(`Sort Name` == "Beach Boys") |>
+  select(`Spotify Popularity`, `Sort Name`, `Album`) |>
+  arrange(`Spotify Popularity`)
 ```
 
 Write your findings here.
 
-
+1) Filtering only the genre, Country, the average popularity on Spotify is 56.
+2) After removing all NA's, the highest ranked album in 2020 was "What's Going On" and the lowest ranked album was "Funeral". 
+3) The Beach Boys' most popular album on Spotify was "Pet Sounds" and their least popular album was "The Beach Boys Today!"
 
 
 <!----------------------------------------------------------------------------->
@@ -124,7 +158,7 @@ It's time to choose only one data set. State the data set that you've chosen, an
 
 <!-------------------------- Start your work below ---------------------------->
 
-
+I have chosen Rolling Stone 500 because I am a chronic Spotify addict and want to explore different artist and album popularity throughout the years.
 
 <!----------------------------------------------------------------------------->
 
@@ -139,6 +173,8 @@ Write your research questions **as questions**, and be specific. You can change 
 
 <!-------------------------- Start your work below ---------------------------->
 
+(Primary)Does Spotify popularity correspond at all to gender?
+(Secondary)Is there a drastic difference of that popularity from 2002 to 2020
 
 
 
