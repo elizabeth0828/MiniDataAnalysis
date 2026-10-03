@@ -89,7 +89,7 @@ One way to narrowing down your selection is to *explore* the data sets. Use your
 
 #### Data Set 1
 ```{r}
-boulder <- read_csv("boulder-2020-residential_sales.csv")
+boulder <- read_csv("dat/boulder-2020-residential_sales.csv")
 ### Explore 3 variables of data set 1 ###
 glimpse(boulder)
 
@@ -117,7 +117,7 @@ Write your findings here.
 
 #### Data Set 2
 ```{r}
-music <- read_csv("RollingStone500.csv")
+music <- read_csv("dat/RollingStone500.csv")
 ### Explore 3 variables of data set 2 ###
 glimpse(music)
 
@@ -203,7 +203,19 @@ Your task is to create a table that calculates the proportion of missing values 
 
 ```{r}
 ### Explore missingness here ###
+music_mean <- music|>
+  mutate(is_na_03 = if_else(is.na(`2003 Rank`) == TRUE, 1,0),
+         is_na_12 = if_else(is.na(`2003 Rank`) == TRUE, 1,0),
+         is_na_20 = if_else(is.na(`2003 Rank`) == TRUE, 1,0)) |>
+  summarise(
+    is_na_03 = mean(is_na_03),
+    is_na_12 = mean(is_na_12),
+    is_na_20 = mean(is_na_20)) |>
+  pivot_longer(cols = c(is_na_03, is_na_12, is_na_20),
+               names_to = "Column Name",
+               values_to = "Mean_NA")
 
+#just using the yearly ranking, showing their proportion of NAs
 
 ```
 
@@ -228,7 +240,10 @@ If missingness is not an issue, describe why.
 
 <!-------------------------- Start your work below ---------------------------->
 
-
+The Spotify popularity and gender column technically have no NA in their data set,
+however, there are some albums (around 20%) that are not actually on Spotify (they are simply
+listed as "Not on Spotify" instead of NA) which could pose an issue when comparing
+album's popularity.
 
 
 <!----------------------------------------------------------------------------->
@@ -254,7 +269,13 @@ Show the first 6 rows of the tidied data.
 
 <!-------------------------- Start your work below ---------------------------->
 ```{r}
-
+music |>
+  rename(gender = `Artist Gender`, pop = `Spotify Popularity`) |> #renaming for easier access 
+  mutate(pop = as.numeric(pop)) |> #making the popularity a number and not character, so we can calculate the mean
+  select(`Clean Name`, pop, gender) |> #choosing to make our table only contain the names, popularity, and gender
+  filter(gender == "Male" | gender == "Female") |> #we don't want the male/female category
+group_by(gender) |>
+  summarise(mean_pop = mean(pop, na.rm=TRUE)) #calculating the mean for both genders
 
 ```
 
@@ -269,7 +290,11 @@ Show the outputted table.
 
 <!-------------------------- Start your work below ---------------------------->
 ```{r}
-
+music |>
+  summarise(across(where(is.numeric), mean, na.rm=TRUE),
+            across(where(is.numeric), max, na.rm=TRUE),
+            across(where(is.numeric), min, na.rm=TRUE)
+  )
 
 ```
 
